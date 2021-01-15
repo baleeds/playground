@@ -1,22 +1,15 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 import {
   Box,
   Button,
   ChakraProvider,
   Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
   Heading,
-  HStack,
-  Input,
   Stack,
   Text,
 } from '@chakra-ui/react';
 import { theme } from './theme';
-import { ArrowRightShort, Check, Check2Circle } from 'react-bootstrap-icons';
+import { Check } from 'react-bootstrap-icons';
 import * as Yup from 'yup';
 import { Form, Formik, FormikConfig } from 'formik';
 import { InputControl } from 'formik-chakra-ui';
