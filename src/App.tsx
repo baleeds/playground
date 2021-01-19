@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import {
   Box,
   Button,
@@ -15,9 +15,11 @@ import { theme } from './theme';
 import { Check } from 'react-bootstrap-icons';
 import { appService } from './app.service';
 import { useService } from './useService';
+import { useFormControls } from './useFormControls';
 
 function App() {
   const [state, dispatch] = useService(appService);
+  const formControl = useFormControls(state, dispatch);
 
   return (
     <ChakraProvider theme={theme}>
@@ -39,35 +41,14 @@ function App() {
               <Stack spacing="8px">
                 <FormControl>
                   <FormLabel htmlFor="email">Email Address</FormLabel>
-                  <Input
-                    id="email"
-                    name="email"
-                    colorScheme="primary"
-                    value={state.email}
-                    onChange={(e) =>
-                      dispatch({
-                        type: 'FieldValueChange',
-                        fieldName: 'email',
-                        value: e.target.value,
-                      })
-                    }
-                  />
+                  <Input colorScheme="primary" {...formControl('email')} />
                 </FormControl>
                 <FormControl>
                   <FormLabel htmlFor="password">Password</FormLabel>
                   <Input
-                    id="password"
-                    name="password"
                     type="password"
                     colorScheme="secondary"
-                    value={state.password}
-                    onChange={(e) =>
-                      dispatch({
-                        type: 'FieldValueChange',
-                        fieldName: 'password',
-                        value: e.target.value,
-                      })
-                    }
+                    {...formControl('password')}
                   />
                 </FormControl>
               </Stack>
