@@ -1,86 +1,87 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
   ChakraProvider,
   Flex,
+  FormControl,
+  FormLabel,
   Heading,
+  Input,
   Stack,
   Text,
 } from '@chakra-ui/react';
 import { theme } from './theme';
 import { Check } from 'react-bootstrap-icons';
-import * as Yup from 'yup';
-import { Form, Formik, FormikConfig } from 'formik';
-import { InputControl } from 'formik-chakra-ui';
-
-interface Values {
-  email: string;
-  password: string;
-}
-
-const initialValues: Values = {
-  email: '',
-  password: '',
-};
-
-const validationSchema = Yup.object({
-  email: Yup.string().email().required(),
-  password: Yup.string().required().min(2),
-});
+import { appService } from './app.service';
+import { useService } from './useService';
 
 function App() {
-  const onSubmit: FormikConfig<Values>['onSubmit'] = (values) => {
-    console.log(values);
-  };
+  const [state, dispatch] = useService(appService);
 
   return (
     <ChakraProvider theme={theme}>
-      <Flex align="center" direction="column" p="24">
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={onSubmit}
-        >
-          {({ handleSubmit, values, errors }) => (
-            <Box
-              as={Form}
-              rounded="md"
-              boxShadow="base"
-              bg="white"
-              p="8"
-              minWidth="xl"
-            >
-              <Stack spacing="24px">
-                <Box>
-                  <Heading color="primary.800">This is a header</Heading>
-                  <Text>Here we go!</Text>
-                </Box>
-                <Stack spacing="8px">
-                  <InputControl label="Email" name="email" />
-                  <InputControl label="Password" name="password" />
-                  {/* <FormControl>
-                    <FormLabel htmlFor="email">Email Address</FormLabel>
-                    <Input id="email" name="email" colorScheme="primary" />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor="password">Password</FormLabel>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      colorScheme="secondary"
-                    />
-                  </FormControl> */}
-                </Stack>
-                <Button colorScheme="primary" leftIcon={<Check size={24} />}>
-                  Login
-                </Button>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          dispatch({ type: 'Submit' });
+        }}
+      >
+        <Flex align="center" direction="column" p="24">
+          <Box rounded="md" boxShadow="base" bg="white" p="8" minWidth="xl">
+            <Stack spacing="24px">
+              <Box>
+                <Heading color="primary.800">
+                  {state.success ? 'Yeahhhh' : 'Login'}
+                </Heading>
+                <Text>{state.isLoading ? 'Here we go!' : 'Waiting'}</Text>
+              </Box>
+              <Stack spacing="8px">
+                <FormControl>
+                  <FormLabel htmlFor="email">Email Address</FormLabel>
+                  <Input
+                    id="email"
+                    name="email"
+                    colorScheme="primary"
+                    value={state.email}
+                    onChange={(e) =>
+                      dispatch({
+                        type: 'FieldValueChange',
+                        fieldName: 'email',
+                        value: e.target.value,
+                      })
+                    }
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    colorScheme="secondary"
+                    value={state.password}
+                    onChange={(e) =>
+                      dispatch({
+                        type: 'FieldValueChange',
+                        fieldName: 'password',
+                        value: e.target.value,
+                      })
+                    }
+                  />
+                </FormControl>
               </Stack>
-            </Box>
-          )}
-        </Formik>
-      </Flex>
+              <Button
+                type="submit"
+                colorScheme="primary"
+                leftIcon={<Check size={24} />}
+              >
+                Login
+              </Button>
+            </Stack>
+          </Box>
+        </Flex>
+      </form>
     </ChakraProvider>
   );
 }
