@@ -1,3 +1,6 @@
+import produce, { Draft } from 'immer';
+import { Reducer } from 'react';
+
 export type FormAction<TValues, TFieldName extends keyof TValues> =
   | { type: 'Field:Change'; fieldName: TFieldName; value: TValues[TFieldName] }
   | { type: 'Field:Blur'; fieldName: string }
@@ -16,7 +19,7 @@ export type FormState<TValues> = {
 };
 
 export const initialFormState = <TValues extends { [key: string]: any }>(
-  initialValues: TValues
+  initialValues: TValues,
 ): FormState<TValues> => {
   return Object.keys(initialValues).reduce(
     (state: Record<string, FormControl<any>>, key) => {
@@ -28,26 +31,45 @@ export const initialFormState = <TValues extends { [key: string]: any }>(
 
       return state;
     },
-    {}
+    {},
   ) as FormState<TValues>;
 };
 
+type FormStateSelector<TState> = (
+  state: TState | Draft<TState>,
+) => FormState<any>;
+
 export const reduceFormState = <TState>(
   state: TState,
-  untypedAction: any
-): TState | undefined => {
+  stateSelector: FormStateSelector<TState>,
+  untypedAction: any,
+): TState => {
   const action = untypedAction as FormAction<any, any>;
 
   switch (action.type) {
     case 'Field:Change': {
-      return {
-        ...state,
-        [action.fieldName]: {
+      return produce(state, (draft) => {
+        const formState = stateSelector(draft);
+
+        formState[action.fieldName] = {
           value: action.value,
           touched: true,
           errors: {},
-        },
-      };
+        };
+      });
     }
+    default:
+      return state;
   }
+};
+
+export const formReducer = <TState, TAction>(
+  stateSelector: FormStateSelector<TState>,
+  reducer: Reducer<TState, TAction>,
+): Reducer<TState, TAction> => {
+  return (state, action) => {
+    const nextState = reduceFormState(state, stateSelector, action);
+
+    return reducer(nextState, action);
+  };
 };

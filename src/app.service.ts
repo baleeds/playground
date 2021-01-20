@@ -1,11 +1,6 @@
 import * as Yup from 'yup';
 import { createService } from './createService';
-import {
-  FormAction,
-  FormState,
-  initialFormState,
-  reduceFormState,
-} from './form';
+import { FormAction, formReducer, FormState, initialFormState } from './form';
 
 // const validationSchema = Yup.object({
 //   email: Yup.string().email().required(),
@@ -43,26 +38,26 @@ export const appService = () =>
         password: '',
       }),
     }),
-    reducer: (state: AppServiceState, action: AppServiceAction) => {
-      const nextFormState = reduceFormState(state.form, action);
-      if (nextFormState) return { ...state, form: nextFormState };
-
-      switch (action.type) {
-        case 'Submit':
-          return {
-            ...state,
-            isLoading: true,
-          };
-        case 'Success':
-          return {
-            ...state,
-            isLoading: false,
-            success: true,
-          };
-        default:
-          return state;
-      }
-    },
+    reducer: formReducer(
+      (s) => s.form,
+      (state: AppServiceState, action: AppServiceAction) => {
+        switch (action.type) {
+          case 'Submit':
+            return {
+              ...state,
+              isLoading: true,
+            };
+          case 'Success':
+            return {
+              ...state,
+              isLoading: false,
+              success: true,
+            };
+          default:
+            return state;
+        }
+      },
+    ),
     effects: (action, dispatch) => {
       console.log(action);
 
