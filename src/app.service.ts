@@ -34,7 +34,7 @@ export type AppServiceState = {
 
 export const appService = () =>
   createService<AppServiceState, AppServiceAction>({
-    initialState: {
+    initialState: () => ({
       error: '',
       success: false,
       isLoading: false,
@@ -42,7 +42,7 @@ export const appService = () =>
         email: '',
         password: '',
       }),
-    },
+    }),
     reducer: (state: AppServiceState, action: AppServiceAction) => {
       const nextFormState = reduceFormState(state.form, action);
       if (nextFormState) return { ...state, form: nextFormState };

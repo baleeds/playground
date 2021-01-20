@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 
 export interface Service<TState, TAction> {
-  initialState: TState;
+  initialState: () => TState;
   reducer: (state: TState, action: TAction) => TState;
   effects?: (
     action: TAction,
@@ -18,7 +18,7 @@ export interface HydratedService<TState, TAction> {
 export const createService = <TState, TAction>(
   service: Service<TState, TAction>
 ): HydratedService<TState, TAction> => {
-  const state$ = new BehaviorSubject<TState>(service.initialState);
+  const state$ = new BehaviorSubject<TState>(service.initialState());
 
   const dispatch = (action: TAction) => {
     state$.next(service.reducer(state$.value, action));
