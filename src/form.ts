@@ -1,5 +1,5 @@
 import produce, { Draft } from 'immer';
-import { Reducer } from 'react';
+import { Reducer } from './createService';
 
 export type FormAction<TValues, TFieldName extends keyof TValues> =
   | { type: 'Field:Change'; fieldName: TFieldName; value: TValues[TFieldName] }
@@ -65,11 +65,5 @@ export const reduceFormState = <TState>(
 
 export const formReducer = <TState, TAction>(
   stateSelector: FormStateSelector<TState>,
-  reducer: Reducer<TState, TAction>,
-): Reducer<TState, TAction> => {
-  return (state, action) => {
-    const nextState = reduceFormState(state, stateSelector, action);
-
-    return reducer(nextState, action);
-  };
-};
+) => (state: TState, action: TAction) =>
+  reduceFormState(state, stateSelector, action);

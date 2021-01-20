@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { combineReducers } from './combineReducers';
 import { createService } from './createService';
 import { FormAction, formReducer, FormState, initialFormState } from './form';
 
@@ -38,8 +39,8 @@ export const appService = () =>
         password: '',
       }),
     }),
-    reducer: formReducer(
-      (s) => s.form,
+    reducer: combineReducers(
+      formReducer((s) => s.form),
       (state: AppServiceState, action: AppServiceAction) => {
         switch (action.type) {
           case 'Submit':
