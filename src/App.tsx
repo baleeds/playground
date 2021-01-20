@@ -19,7 +19,7 @@ import { useFormControls } from './useFormControls';
 
 function App() {
   const [state, dispatch] = useService(appService);
-  const formControl = useFormControls(state, dispatch);
+  const formControl = useFormControls(state.form, dispatch);
 
   return (
     <ChakraProvider theme={theme}>

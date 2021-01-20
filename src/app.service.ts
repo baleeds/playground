@@ -25,10 +25,11 @@ type AppServiceAction =
   | { type: 'Submit' }
   | { type: 'Success' };
 
-export type AppServiceState = FormState<LoginValues> & {
+export type AppServiceState = {
   isLoading: boolean;
   success: boolean;
   error: string;
+  form: FormState<LoginValues>;
 };
 
 export const appService = () =>
@@ -37,14 +38,14 @@ export const appService = () =>
       error: '',
       success: false,
       isLoading: false,
-      ...initialFormState<LoginValues>({
+      form: initialFormState<LoginValues>({
         email: '',
         password: '',
       }),
     },
     reducer: (state: AppServiceState, action: AppServiceAction) => {
-      const newState = reduceFormState(state, action);
-      if (newState) return newState;
+      const nextFormState = reduceFormState(state.form, action);
+      if (nextFormState) return { ...state, form: nextFormState };
 
       switch (action.type) {
         case 'Submit':
