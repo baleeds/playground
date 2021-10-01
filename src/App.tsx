@@ -6,6 +6,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  FormErrorMessage,
   Heading,
   Input,
   Stack,
@@ -16,10 +17,12 @@ import { Check } from 'react-bootstrap-icons';
 import { appService } from './app.service';
 import { useService } from './useService';
 import { useFormControls } from './useFormControls';
+import { useFormSelectors } from './useFormState';
 
 function App() {
   const [state, dispatch] = useService(appService);
   const formControl = useFormControls(state.form, dispatch);
+  const { isInvalid } = useFormSelectors(state.form);
 
   return (
     <ChakraProvider theme={theme}>
@@ -39,16 +42,17 @@ function App() {
                 <Text>{state.isLoading ? 'Here we go!' : 'Waiting'}</Text>
               </Box>
               <Stack spacing="8px">
-                <FormControl>
+                <FormControl isInvalid={formControl('email').isInvalid}>
                   <FormLabel htmlFor="email">Email Address</FormLabel>
-                  <Input colorScheme="primary" {...formControl('email')} />
+                  <Input colorScheme="primary" {...formControl('email').props} />
+                  <FormErrorMessage>Email is required</FormErrorMessage>
                 </FormControl>
-                <FormControl>
+                <FormControl isInvalid={formControl('password').isInvalid}>
                   <FormLabel htmlFor="password">Password</FormLabel>
                   <Input
                     type="password"
                     colorScheme="secondary"
-                    {...formControl('password')}
+                    {...formControl('password').props}
                   />
                 </FormControl>
               </Stack>
@@ -56,6 +60,7 @@ function App() {
                 type="submit"
                 colorScheme="primary"
                 leftIcon={<Check size={24} />}
+                disabled={isInvalid}
               >
                 Login
               </Button>

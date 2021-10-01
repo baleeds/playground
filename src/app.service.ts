@@ -1,11 +1,24 @@
 import * as Yup from 'yup';
 import { combineReducers } from './combineReducers';
-import { createService } from './createService';
-import { FormAction, formReducer, FormState, initialFormState } from './form';
+import { createService, Service } from './createService';
+import { FormAction, formEffects, formReducer, FormState, initialFormState } from './form';
 
 // const validationSchema = Yup.object({
 //   email: Yup.string().email().required(),
 //   password: Yup.string().required().min(2),
+// });
+
+// interface CreateFormServiceParams<TValues> {
+//   initialValues: () => TValues;
+// }
+
+// const formService = <TValues>({
+//   initialValues,
+// }: CreateFormServiceParams<TValues>): Service<
+//   FormState<TValues>,
+//   FormAction<TValues, keyof TValues>
+// > => ({
+//   initialValues,
 // });
 
 interface LoginValues {
@@ -59,8 +72,16 @@ export const appService = () =>
         }
       },
     ),
-    effects: (action, dispatch) => {
+    effects: (action, dispatch, state) => {
       console.log(action);
+      console.log(state);
+
+      formEffects<LoginValues>(state.form, action, dispatch, (values) => {
+        return {
+          email: !values.email ? { required: true } : null,
+          password: !values.password ? { required: true } : null,
+        };
+      });
 
       switch (action.type) {
         case 'Submit': {
